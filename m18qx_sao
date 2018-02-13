@@ -1,0 +1,25 @@
+#! /bin/sh
+
+case "$1" in
+  start)
+        echo -n "Starting the WNC M18Qx IoT daemon: "
+	start-stop-daemon -S -b -a "/data/jim/iot_monitor -f"
+	echo "done"
+	;;
+  stop)
+	echo -n "Stopping malmanager: "
+	start-stop-daemon -K -x /data/jim/iot_monitor
+	sync
+	echo "done"
+	;;
+  restart)
+  	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: m18qx_ft { start | stop | restart }" >&2
+	exit 1
+	;;
+esac
+
+exit 0
