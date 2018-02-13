@@ -286,7 +286,7 @@ float lis2dw12_readTemp12( void ) {
 int lis2dw12_readTemp8( void ) {
     uint8_t low=0, high=0;
     int tempC=0, tempF=0, v=0;
-    char cfl[6];
+    char cfl[5];
     char s[3]="10";
     int vs,j;
      printf("Modificado por: Francisco Anacona!");
@@ -295,7 +295,7 @@ int lis2dw12_readTemp8( void ) {
     WRITE_REGISTER(LIS2DW12_CTRL1,LIS2DW12_CCONV);
     TRIGGER_TEMP;
     for(j=1;j<6;j++){
-        
+
         v = (int)READ_REGISTER(LIS2DW12_OUT_T);
         v = v<<((sizeof(int)-1)*8);
         v = v>>((sizeof(int)-1)*8);
@@ -307,7 +307,7 @@ int lis2dw12_readTemp8( void ) {
             printf("-LIS2DW12: tempF =%d\n",tempF);
             }
 
-        snprintf(cfl, sizeof cfl, "%f", tempF);
+        sprintf(cfl, "%d", tempF);
     
         char dataT [60]= "{ \"timestamp\": \"2018-02-11T10:";
         strcat (dataT,s);
