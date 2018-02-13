@@ -847,7 +847,7 @@ int command_gps(int argc, const char * const * argv )
     struct tm gps_time;
     json_keyval om[12];
     int k, done, i, intfmt, strfmt,latp,lonp;
-    char dataT [60]= "{ \"name\": \"OficinaR\", \"latitude\": \"";
+    char dataT [60]= "{ \"name\": \"oficinaR\", \"latitude\": ";
      char latpc[9];
      char lonpc[9];
     const char *mode[] = {
@@ -872,14 +872,14 @@ int command_gps(int argc, const char * const * argv )
                 latp=atof(om[i].value);
                 sprintf(latpc, "%d", latp);
                 strcat (dataT,latpc);
-                strcat (dataT,"\", \"longitude\": \"");
+                strcat (dataT,", \"longitude\": ");
                  }
             else if( !strcmp(om[i].key,"longitude") ){
                 printf("longitude: %f\n",atof(om[i].value));
                 lonp=atof(om[i].value);
                 sprintf(lonpc, "%d", lonp);
                 strcat (dataT,lonpc);
-                strcat(dataT,"\", \"elevation\": \"0\" }");
+                strcat(dataT,", \"elevation\": 0 }");
 
                 CURL *curl;
         CURLcode res;
@@ -888,7 +888,7 @@ int command_gps(int argc, const char * const * argv )
         curl = curl_easy_init();
         if(curl) {
 
-            curl_easy_setopt(curl, CURLOPT_URL, "https://api-m2x.att.com/v2/devices/da7f2862f07def7fe55ceba340ca17fa/streams/temperature/value");
+            curl_easy_setopt(curl, CURLOPT_URL, "https://api-m2x.att.com/v2/devices/da7f2862f07def7fe55ceba340ca17fa/location");
             headerlist = curl_slist_append(headerlist, "X-M2X-KEY: d549d6e3654bbca4f4ee7e5d6babb4f9");
             headerlist = curl_slist_append(headerlist, "Content-Type: application/json");
             curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
