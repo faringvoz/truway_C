@@ -37,6 +37,7 @@
 
 extern "C" {
 #include <hwlib/hwlib.h>
+#include <curl/curl.h>
 }
 
 #include "iot_monitor.h"
@@ -845,7 +846,8 @@ int command_gps(int argc, const char * const * argv )
 {   
     struct tm gps_time;
     json_keyval om[12];
-    int k, done, i, intfmt, strfmt;
+    int k, done, i, intfmt, strfmt,latp,lonp;
+    char dataT [60]= "{ \"name\": \"OficinaR\", \"latitude\": \"";
     const char *mode[] = {
         "2-MS-based mode",
         "3-MS assisted mode",
@@ -863,10 +865,37 @@ int command_gps(int argc, const char * const * argv )
         for( i=1, intfmt=strfmt=0; i<k; i++ ) {
             if( !strcmp(om[i].key,"loc_status") )
                 printf("Status: %s\n",atoi(om[i].value)?"COMPLETED\n":"IN PROGRESS");
-            else if( !strcmp(om[i].key,"latitude") )
+            else if( !strcmp(om[i].key,"latitude") ){
                 printf(" latitude: %f\n",atof(om[i].value));
-            else if( !strcmp(om[i].key,"longitude") )
+                sprintf(latp, "%d", atof(om[i].value));
+                strcat (dataT,latp);
+                strcat (dataT,"\", \"longitude\": \"")
+                 }
+            else if( !strcmp(om[i].key,"longitude") ){
                 printf("longitude: %f\n",atof(om[i].value));
+                sprintf(lonp, "%d", atof(om[i].value));
+                strcat (dataT,lonp);
+                strcat(dataT,"\", \"elevation\": \"0\" }");
+
+                CURL *curl;
+        CURLcode res;
+        struct curl_slist *headerlist=NULL;
+
+        curl = curl_easy_init();
+        if(curl) {
+
+            curl_easy_setopt(curl, CURLOPT_URL, "https://api-m2x.att.com/v2/devices/da7f2862f07def7fe55ceba340ca17fa/streams/temperature/value");
+            headerlist = curl_slist_append(headerlist, "X-M2X-KEY: d549d6e3654bbca4f4ee7e5d6babb4f9");
+            headerlist = curl_slist_append(headerlist, "Content-Type: application/json");
+            curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
+            curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_easy_setopt(curl, CURLOPT_POSTFIELDS, dataT );
+
+            res = curl_easy_perform(curl);
+            curl_easy_cleanup(curl);
+        }
+
+              }
             else if( !strcmp(om[i].key,"timestamp") ) {
                 char buf[80];
                 time_t rawtime = ascii_to_epoch(om[i].value);
