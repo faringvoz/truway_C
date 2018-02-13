@@ -872,7 +872,7 @@ int command_gps(int argc, const char * const * argv )
                 latp=atof(om[i].value);
                 sprintf(latpc, "%d", latp);
                 strcat (dataT,latpc);
-                strcat (dataT,"\", \"longitude\": \"")
+                strcat (dataT,"\", \"longitude\": \"");
                  }
             else if( !strcmp(om[i].key,"longitude") ){
                 printf("longitude: %f\n",atof(om[i].value));
