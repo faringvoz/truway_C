@@ -249,6 +249,18 @@ uint8_t lis2dw12_getDeviceID(void) {
     return lis2dw12_read_byte(LIS2DW12_WHO_AM_I_ADDR);
 }
 
+int msleep(unsigned long milisec)   
+{   
+    struct timespec req={0};   
+    time_t sec=(int)(milisec/1000);   
+    milisec=milisec-(sec*1000);   
+    req.tv_sec=sec;   
+    req.tv_nsec=milisec*1000000L;   
+    while(nanosleep(&req,&req)==-1)   
+        continue;   
+    return 1;   
+} 
+
 float lis2dw12_readTemp12( void ) {
     int i;
     uint8_t low=0, high=0, v=0;
@@ -275,25 +287,37 @@ int lis2dw12_readTemp8( void ) {
     uint8_t low=0, high=0;
     int tempC=0, tempF=0, v=0;
     char cfl[6];
+    char s[3]="10";
+    int vs,j;
+     printf("Modificado por: Francisco Anacona!");
+
+
     WRITE_REGISTER(LIS2DW12_CTRL1,LIS2DW12_CCONV);
     TRIGGER_TEMP;
-    printf("Modificado por: Francisc Anacona!");
-    v = (int)READ_REGISTER(LIS2DW12_OUT_T);
-    v = v<<((sizeof(int)-1)*8);
-    v = v>>((sizeof(int)-1)*8);
-    tempC = v+25;
-    tempF = (tempC*9.0)/5.0 + 32;
-    if( dbg_flag & DBG_LIS2DW12 ) {
-        printf("-LIS2DW12: reg   =%d - 0x%02X\n",v,v);
-        printf("-LIS2DW12: tempC =%d\n",tempC);
-        printf("-LIS2DW12: tempF =%d\n",tempF);
-        }
+    for(j=1;j<6;j++){
+        
+        v = (int)READ_REGISTER(LIS2DW12_OUT_T);
+        v = v<<((sizeof(int)-1)*8);
+        v = v>>((sizeof(int)-1)*8);
+        tempC = v+25;
+        tempF = (tempC*9.0)/5.0 + 32;
+        if( dbg_flag & DBG_LIS2DW12 ) {
+            printf("-LIS2DW12: reg   =%d - 0x%02X\n",v,v);
+            printf("-LIS2DW12: tempC =%d\n",tempC);
+            printf("-LIS2DW12: tempF =%d\n",tempF);
+            }
 
-    snprintf(cfl, sizeof cfl, "%f", tempF);
-    char dataT [60]= "{ \"timestamp\": \"2018-02-11T10:00";
-    strcat (dataT,":00.789Z\", \"value\": ");
-    strcat (dataT, cfl);
-    strcat (dataT, " }");
+        snprintf(cfl, sizeof cfl, "%f", tempF);
+    
+        char dataT [60]= "{ \"timestamp\": \"2018-02-11T10:";
+        strcat (dataT,s);
+        strcat (dataT,":00.789Z\", \"value\": ");
+        strcat (dataT, cfl);
+        strcat (dataT, " }");
+        vs = atoi (s);
+        vs = vs+3;
+        sprintf(s, "%d", vs);
+
         CURL *curl;
         CURLcode res;
         struct curl_slist *headerlist=NULL;
@@ -311,6 +335,8 @@ int lis2dw12_readTemp8( void ) {
             res = curl_easy_perform(curl);
             curl_easy_cleanup(curl);
         }
+        msleep(3000);
+    }
     return tempF;
 }
 
