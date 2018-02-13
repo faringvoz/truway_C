@@ -848,6 +848,8 @@ int command_gps(int argc, const char * const * argv )
     json_keyval om[12];
     int k, done, i, intfmt, strfmt,latp,lonp;
     char dataT [60]= "{ \"name\": \"OficinaR\", \"latitude\": \"";
+     char latpc[9];
+     char lonpc[9];
     const char *mode[] = {
         "2-MS-based mode",
         "3-MS assisted mode",
@@ -867,14 +869,16 @@ int command_gps(int argc, const char * const * argv )
                 printf("Status: %s\n",atoi(om[i].value)?"COMPLETED\n":"IN PROGRESS");
             else if( !strcmp(om[i].key,"latitude") ){
                 printf(" latitude: %f\n",atof(om[i].value));
-                sprintf(latp, "%d", atof(om[i].value));
-                strcat (dataT,latp);
+                latp=atof(om[i].value);
+                sprintf(latpc, "%d", latp);
+                strcat (dataT,latpc);
                 strcat (dataT,"\", \"longitude\": \"")
                  }
             else if( !strcmp(om[i].key,"longitude") ){
                 printf("longitude: %f\n",atof(om[i].value));
-                sprintf(lonp, "%d", atof(om[i].value));
-                strcat (dataT,lonp);
+                lonp=atof(om[i].value);
+                sprintf(lonpc, "%d", lonp);
+                strcat (dataT,lonpc);
                 strcat(dataT,"\", \"elevation\": \"0\" }");
 
                 CURL *curl;
